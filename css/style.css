@@ -1,0 +1,637 @@
+/* ============================================================
+ * BookEasy — style.css
+ * Layout khung sườn: header + nav 2 khu vực (Đặt lịch / Quản trị)
+ * Responsive: breakpoint chính ~768px
+ * ============================================================ */
+
+:root {
+  --ink: #1F2937;
+  --ink-soft: #6B7280;
+  --paper: #F4F6F8;
+  --paper-2: #FFFFFF;
+  --line: #E1E5EA;
+  --primary: #2563EB;
+  --primary-soft: #DCE7FE;
+  --accent: #0EA5A4;
+  --ok: #16A34A;
+  --warn: #D97706;
+  --err: #DC2626;
+  --radius: 8px;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.5;
+}
+
+/* ---------- Header ---------- */
+
+.app-header {
+  background: var(--primary);
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.app-header h1 {
+  font-size: 18px;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.app-header .tagline {
+  font-size: 12px;
+  color: var(--primary-soft);
+  margin-top: 2px;
+}
+
+/* ---------- Khối "Lịch hẹn sắp tới" / nhắc lịch nội bộ (header) ---------- */
+
+.reminder-widget {
+  position: relative;
+}
+
+.reminder-badge-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.reminder-badge-btn:hover,
+.reminder-badge-btn[aria-expanded="true"] {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.reminder-badge-icon { font-size: 14px; }
+
+.reminder-badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.reminder-badge-btn.has-soon .reminder-badge-count {
+  background: var(--warn);
+  color: #fff;
+}
+
+.reminder-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 300px;
+  max-width: 90vw;
+  max-height: 360px;
+  overflow-y: auto;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  z-index: 50;
+}
+
+.reminder-panel[hidden] { display: none; }
+
+.reminder-panel-head {
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  background: #F9FAFB;
+  border-bottom: 1px solid var(--line);
+}
+
+.reminder-panel-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.reminder-item {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12.5px;
+}
+
+.reminder-item:last-child { border-bottom: none; }
+
+.reminder-item-time { font-weight: 700; }
+
+.reminder-item-info { color: var(--ink-soft); margin-top: 2px; }
+
+.reminder-item-soon { background: #FFF7ED; }
+
+.reminder-item-soon-tag {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--warn);
+  background: #FEF3C7;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.reminder-panel-empty {
+  padding: 12px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin: 0;
+}
+
+.reminder-panel-footnote {
+  padding: 8px 12px;
+  margin: 0;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- Nav (2 khu vực: Đặt lịch / Quản trị) ---------- */
+
+.app-nav {
+  display: flex;
+  gap: 8px;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+  padding: 8px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-wrap: wrap;
+}
+
+.nav-btn {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 9px 16px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.nav-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.nav-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ---------- Layout chính ---------- */
+
+.app-main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+.panel {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+
+.panel > .panel-head {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  background: #F9FAFB;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.panel > .panel-head h2 {
+  font-size: 14px;
+  margin: 0;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.panel > .panel-body {
+  padding: 16px;
+}
+
+.placeholder-note {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* ---------- Form elements dùng chung ---------- */
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+label.field-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+input.plain, select.plain, textarea.plain {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  background: #fff;
+  color: var(--ink);
+}
+
+input.plain:focus, select.plain:focus, textarea.plain:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.btn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: #1D4ED8; }
+.btn-ghost { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+
+.btn-sm {
+  font-size: 11.5px;
+  padding: 5px 10px;
+  margin-right: 6px;
+}
+
+.btn-sm:last-child { margin-right: 0; }
+
+.btn-danger { color: var(--err); border-color: var(--err); }
+
+/* ---------- Form cấu hình (dịch vụ / nhân viên) ---------- */
+
+.config-form-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.config-form-actions-single {
+  justify-content: flex-start;
+}
+
+.field-single {
+  margin-bottom: 12px;
+}
+
+.form-msg {
+  min-height: 16px;
+  font-size: 12.5px;
+  margin: 0 0 12px;
+}
+
+.form-msg-ok { color: var(--ok); }
+.form-msg-err { color: var(--err); }
+
+.actions-cell { white-space: nowrap; }
+
+/* ---------- Table dùng chung (danh sách lịch hẹn) ---------- */
+
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+table.data-table th {
+  background: #F9FAFB;
+  text-align: left;
+  padding: 8px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+table.data-table td {
+  border: 1px solid var(--line);
+  padding: 7px 8px;
+  vertical-align: top;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.badge-confirmed { background: var(--primary-soft); color: var(--primary); }
+.badge-cancelled { background: #FEE2E2; color: var(--err); }
+.badge-completed { background: #DCFCE7; color: var(--ok); }
+
+/* ---------- Quản trị lịch hẹn: toolbar (lọc ngày + chuyển chế độ xem) ---------- */
+
+.appt-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.appt-toolbar-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.appt-toolbar-filter-row input[type="date"] {
+  max-width: 170px;
+}
+
+.appt-toolbar-viewmode {
+  display: flex;
+  gap: 6px;
+}
+
+.appt-toolbar-export {
+  display: flex;
+  gap: 6px;
+}
+
+.view-toggle-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ---------- Trạng thái: select đổi trạng thái ngay trên bảng ---------- */
+
+select.status-select {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--sans);
+  cursor: pointer;
+  background: #fff;
+}
+
+select.status-select.status-confirmed { background: var(--primary-soft); color: var(--primary); border-color: var(--primary-soft); }
+select.status-select.status-cancelled { background: #FEE2E2; color: var(--err); border-color: #FEE2E2; }
+select.status-select.status-completed { background: #DCFCE7; color: var(--ok); border-color: #DCFCE7; }
+
+/* ---------- Lịch ngày (nhóm theo khung giờ) ---------- */
+
+.appt-day-view {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.appt-hour-group {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.appt-hour-group-head {
+  background: #F9FAFB;
+  padding: 7px 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+}
+
+.appt-card {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.appt-card:last-child { border-bottom: none; }
+
+.appt-card-info { font-size: 12.5px; min-width: 200px; }
+
+.appt-card-time { font-weight: 700; color: var(--ink); }
+
+.appt-card-service { color: var(--ink-soft); }
+
+.appt-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Modal sửa lịch hẹn ---------- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 100;
+}
+
+.modal-overlay[hidden] { display: none; }
+
+.modal-box {
+  background: #fff;
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal-head h3 {
+  margin: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--ink-soft);
+  padding: 2px 6px;
+}
+
+.modal-close:hover { color: var(--err); }
+
+.modal-body { padding: 16px; }
+
+/* ---------- Responsive: mobile breakpoint ~768px ---------- */
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 12px 14px;
+  }
+
+  .app-header h1 {
+    font-size: 16px;
+  }
+
+  .app-nav {
+    padding: 8px 14px;
+    gap: 6px;
+  }
+
+  .nav-btn {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 10px 8px;
+    font-size: 12.5px;
+  }
+
+  .app-main {
+    padding: 14px;
+  }
+
+  .panel > .panel-body {
+    padding: 12px;
+  }
+
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  table.data-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .appt-toolbar {
+    align-items: stretch;
+  }
+
+  .appt-toolbar-viewmode {
+    justify-content: stretch;
+  }
+
+  .appt-toolbar-viewmode .view-toggle-btn {
+    flex: 1 1 auto;
+  }
+
+  .appt-toolbar-export {
+    justify-content: stretch;
+  }
+
+  .appt-toolbar-export button {
+    flex: 1 1 auto;
+  }
+
+  .appt-toolbar-filter-row input[type="date"] {
+    max-width: none;
+    flex: 1 1 auto;
+  }
+
+  .appt-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .appt-card-actions {
+    justify-content: flex-start;
+  }
+
+  .modal-box {
+    max-width: 100%;
+  }
+
+  .reminder-panel {
+    right: -6px;
+    width: min(320px, 92vw);
+  }
+}
