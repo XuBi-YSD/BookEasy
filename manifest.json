@@ -1,0 +1,16 @@
+{
+  "name": "BookEasy — Đặt lịch hẹn & nhắc lịch",
+  "short_name": "BookEasy",
+  "description": "Đặt lịch hẹn & nhắc lịch cho spa / salon / phòng khám / trung tâm gia sư",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f5f7",
+  "theme_color": "#4f46e5",
+  "lang": "vi",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
