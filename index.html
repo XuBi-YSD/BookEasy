@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookEasy — Đặt lịch hẹn &amp; nhắc lịch</title>
+<link rel="stylesheet" href="css/style.css">
+
+<!-- PWA: cho phép "Thêm vào Màn hình chính" trên điện thoại, chạy full-screen như app thật -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4f46e5">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="BookEasy">
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <h1>BookEasy</h1>
+    <div class="tagline">Đặt lịch hẹn &amp; nhắc lịch cho spa / salon / phòng khám / trung tâm gia sư</div>
+  </div>
+
+  <div class="reminder-widget" id="reminderWidget">
+    <button type="button" class="reminder-badge-btn" id="reminderBadgeBtn" aria-haspopup="true" aria-expanded="false">
+      <span class="reminder-badge-icon" aria-hidden="true">&#128276;</span>
+      <span class="reminder-badge-label">Lịch hẹn hôm nay</span>
+      <span class="reminder-badge-count" id="reminderBadgeCount">0</span>
+    </button>
+    <div class="reminder-panel" id="reminderPanel" hidden>
+      <div class="reminder-panel-head">Lịch hẹn hôm nay (đã xác nhận, còn lại)</div>
+      <div class="reminder-panel-list" id="reminderPanelList"></div>
+      <p class="reminder-panel-empty" id="reminderPanelEmpty" hidden>Không còn lịch hẹn nào hôm nay.</p>
+      <p class="reminder-panel-footnote">Nhắc lịch nội bộ trong ứng dụng — không gửi SMS / Email / Zalo.</p>
+    </div>
+  </div>
+</header>
+
+<nav class="app-nav" id="mainNav">
+  <button class="nav-btn active" data-view="booking" type="button">Đặt lịch</button>
+  <button class="nav-btn" data-view="admin" type="button">Quản trị</button>
+</nav>
+
+<main class="app-main">
+
+  <section class="view active" id="view-booking" data-view="booking">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Đặt lịch hẹn</h2>
+      </div>
+      <div class="panel-body">
+        <form id="bookingForm" class="config-form" novalidate>
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="bookingService">Dịch vụ *</label>
+              <select class="plain" id="bookingService" required></select>
+            </div>
+            <div>
+              <label class="field-label" for="bookingStaff">Nhân viên phục vụ (tuỳ chọn)</label>
+              <select class="plain" id="bookingStaff"></select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="bookingDate">Ngày hẹn *</label>
+              <input class="plain" type="date" id="bookingDate" required>
+            </div>
+            <div>
+              <label class="field-label" for="bookingTime">Giờ hẹn *</label>
+              <input class="plain" type="time" id="bookingTime" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="bookingCustomerName">Tên khách hàng *</label>
+              <input class="plain" type="text" id="bookingCustomerName" required>
+            </div>
+            <div>
+              <label class="field-label" for="bookingPhone">Số điện thoại *</label>
+              <input class="plain" type="tel" id="bookingPhone" placeholder="VD: 0912345678" required>
+            </div>
+          </div>
+          <div class="field-single">
+            <label class="field-label" for="bookingNote">Ghi chú (tuỳ chọn)</label>
+            <textarea class="plain" id="bookingNote" rows="2"></textarea>
+          </div>
+          <div class="config-form-actions config-form-actions-single">
+            <button type="submit" class="btn btn-primary" id="bookingSubmitBtn">Đặt lịch hẹn</button>
+          </div>
+        </form>
+        <p class="form-msg" id="bookingFormMsg"></p>
+        <p class="placeholder-note" id="bookingNoServicesNote" hidden>Chưa có dịch vụ nào được cấu hình. Vui lòng vào mục "Quản trị" để thêm dịch vụ trước khi đặt lịch.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-admin" data-view="admin">
+
+    <div class="panel" id="panel-services">
+      <div class="panel-head">
+        <h2>Cấu hình dịch vụ</h2>
+      </div>
+      <div class="panel-body">
+        <form id="serviceForm" class="config-form" novalidate>
+          <input type="hidden" id="serviceEditId" value="">
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="serviceName">Tên dịch vụ *</label>
+              <input class="plain" type="text" id="serviceName" required>
+            </div>
+            <div>
+              <label class="field-label" for="serviceDuration">Thời lượng (phút) *</label>
+              <input class="plain" type="number" id="serviceDuration" min="1" step="1" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="servicePrice">Giá (VNĐ, để trống nếu không áp dụng)</label>
+              <input class="plain" type="number" id="servicePrice" min="0" step="1000">
+            </div>
+            <div class="config-form-actions">
+              <label class="field-label">&nbsp;</label>
+              <button type="submit" class="btn btn-primary" id="serviceSubmitBtn">Thêm dịch vụ</button>
+              <button type="button" class="btn btn-ghost" id="serviceCancelBtn" hidden>Huỷ sửa</button>
+            </div>
+          </div>
+        </form>
+        <p class="form-msg" id="serviceFormMsg"></p>
+
+        <table class="data-table" id="serviceTable">
+          <thead>
+            <tr>
+              <th>Tên dịch vụ</th>
+              <th>Thời lượng</th>
+              <th>Giá</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="serviceTableBody"></tbody>
+        </table>
+        <p class="placeholder-note" id="serviceEmptyNote" hidden>Chưa có dịch vụ nào. Thêm dịch vụ đầu tiên ở form phía trên.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-staff">
+      <div class="panel-head">
+        <h2>Cấu hình nhân viên</h2>
+      </div>
+      <div class="panel-body">
+        <form id="staffForm" class="config-form" novalidate>
+          <input type="hidden" id="staffEditId" value="">
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="staffName">Tên nhân viên *</label>
+              <input class="plain" type="text" id="staffName" required>
+            </div>
+            <div class="config-form-actions">
+              <label class="field-label">&nbsp;</label>
+              <button type="submit" class="btn btn-primary" id="staffSubmitBtn">Thêm nhân viên</button>
+              <button type="button" class="btn btn-ghost" id="staffCancelBtn" hidden>Huỷ sửa</button>
+            </div>
+          </div>
+        </form>
+        <p class="form-msg" id="staffFormMsg"></p>
+
+        <table class="data-table" id="staffTable">
+          <thead>
+            <tr>
+              <th>Tên nhân viên</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="staffTableBody"></tbody>
+        </table>
+        <p class="placeholder-note" id="staffEmptyNote" hidden>Chưa có nhân viên nào. Thêm nhân viên đầu tiên ở form phía trên.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-appointments">
+      <div class="panel-head">
+        <h2>Quản trị lịch hẹn</h2>
+      </div>
+      <div class="panel-body">
+
+        <div class="appt-toolbar">
+          <div class="appt-toolbar-filter">
+            <label class="field-label" for="apptFilterDate">Xem theo ngày</label>
+            <div class="appt-toolbar-filter-row">
+              <input class="plain" type="date" id="apptFilterDate">
+              <button type="button" class="btn btn-ghost btn-sm" id="apptFilterTodayBtn">Hôm nay</button>
+            </div>
+          </div>
+          <div class="appt-toolbar-viewmode" role="group" aria-label="Chế độ xem">
+            <button type="button" class="btn btn-ghost btn-sm view-toggle-btn active" data-mode="list" id="apptViewListBtn">Danh sách</button>
+            <button type="button" class="btn btn-ghost btn-sm view-toggle-btn" data-mode="day" id="apptViewDayBtn">Lịch ngày</button>
+          </div>
+          <div class="appt-toolbar-export" role="group" aria-label="Xuất Excel">
+            <button type="button" class="btn btn-ghost btn-sm" id="apptExportDayBtn">Xuất Excel ngày</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="apptExportWeekBtn">Xuất Excel tuần</button>
+          </div>
+        </div>
+        <p class="form-msg" id="apptExportMsg"></p>
+
+        <table class="data-table" id="apptTable">
+          <thead>
+            <tr>
+              <th>Giờ</th>
+              <th>Khách hàng</th>
+              <th>Dịch vụ</th>
+              <th>Nhân viên</th>
+              <th>SĐT</th>
+              <th>Trạng thái</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="apptTableBody"></tbody>
+        </table>
+
+        <div class="appt-day-view" id="apptDayView" hidden></div>
+
+        <p class="placeholder-note" id="apptEmptyNote" hidden>Không có lịch hẹn nào trong ngày đã chọn.</p>
+        <p class="placeholder-note" id="seedStatus"></p>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<div class="modal-overlay" id="apptEditOverlay" hidden>
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Sửa lịch hẹn</h3>
+      <button type="button" class="modal-close" id="apptEditCloseBtn" aria-label="Đóng">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="apptEditForm" class="config-form" novalidate>
+        <input type="hidden" id="apptEditId">
+        <div class="field-row">
+          <div>
+            <label class="field-label" for="apptEditService">Dịch vụ *</label>
+            <select class="plain" id="apptEditService" required></select>
+          </div>
+          <div>
+            <label class="field-label" for="apptEditStaff">Nhân viên phục vụ (tuỳ chọn)</label>
+            <select class="plain" id="apptEditStaff"></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div>
+            <label class="field-label" for="apptEditDate">Ngày hẹn *</label>
+            <input class="plain" type="date" id="apptEditDate" required>
+          </div>
+          <div>
+            <label class="field-label" for="apptEditTime">Giờ hẹn *</label>
+            <input class="plain" type="time" id="apptEditTime" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div>
+            <label class="field-label" for="apptEditCustomerName">Tên khách hàng *</label>
+            <input class="plain" type="text" id="apptEditCustomerName" required>
+          </div>
+          <div>
+            <label class="field-label" for="apptEditPhone">Số điện thoại *</label>
+            <input class="plain" type="tel" id="apptEditPhone" placeholder="VD: 0912345678" required>
+          </div>
+        </div>
+        <div class="field-single">
+          <label class="field-label" for="apptEditNote">Ghi chú (tuỳ chọn)</label>
+          <textarea class="plain" id="apptEditNote" rows="2"></textarea>
+        </div>
+        <p class="form-msg" id="apptEditFormMsg"></p>
+        <div class="config-form-actions config-form-actions-single">
+          <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+          <button type="button" class="btn btn-ghost" id="apptEditCancelBtn">Huỷ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/admin-config.js"></script>
+<script src="js/booking-form.js"></script>
+<script src="js/admin-appointments.js"></script>
+<script src="js/upcoming-reminders.js"></script>
+<script src="js/export-excel.js"></script>
+<script>
+  (function () {
+    'use strict';
+
+    // Chuyển đổi giữa 2 khu vực nav: Đặt lịch / Quản trị
+    var navButtons = document.querySelectorAll('#mainNav .nav-btn');
+    var views = document.querySelectorAll('.view');
+
+    navButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = btn.getAttribute('data-view');
+
+        navButtons.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+
+        views.forEach(function (v) {
+          v.classList.toggle('active', v.getAttribute('data-view') === target);
+        });
+      });
+    });
+
+    // Sanity check: xác nhận data model + seed đã nạp qua localStorage (BookEasyStorage từ js/storage.js)
+    var seedStatusEl = document.getElementById('seedStatus');
+    if (seedStatusEl && window.BookEasyStorage) {
+      var services = window.BookEasyStorage.getServices();
+      var staff = window.BookEasyStorage.getStaff();
+      var appointments = window.BookEasyStorage.getAppointments();
+      seedStatusEl.textContent =
+        'Data model: ' + services.length + ' dịch vụ, ' +
+        staff.length + ' nhân viên, ' +
+        appointments.length + ' lịch hẹn (localStorage namespaced+versioned: bookeasy_*_v1).';
+    }
+
+    // Đăng ký service worker (PWA) — chỉ hoạt động khi phục vụ qua http(s)://,
+    // trình duyệt không cho service worker chạy trên origin file:// (mở file trực
+    // tiếp qua double-click). Không lỗi/không ảnh hưởng gì nếu chạy qua file://,
+    // chỉ đơn giản là tính năng cài-vào-máy/offline sẽ không kích hoạt.
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('service-worker.js').catch(function (err) {
+          console.warn('[PWA] Đăng ký service worker thất bại:', err);
+        });
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
